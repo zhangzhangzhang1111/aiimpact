@@ -5,6 +5,7 @@ ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 VENDOR_DIR="${ROOT_DIR}/tools/vendor"
 BIN_DIR="${VENDOR_DIR}/bin"
 DOWNLOAD_DIR="${VENDOR_DIR}/downloads"
+LUALS_OFFLINE_DIR="${LUALS_OFFLINE_DIR:-${ROOT_DIR}/tools/offline}"
 CODEGRAPH_OFFLINE_DIR="${CODEGRAPH_OFFLINE_DIR:-${ROOT_DIR}/tools/offline}"
 mkdir -p "${VENDOR_DIR}" "${BIN_DIR}" "${DOWNLOAD_DIR}"
 
@@ -26,11 +27,10 @@ need_cmd() {
   }
 }
 
-need_cmd curl
 need_cmd tar
-need_cmd node
 
 resolve_luals_version() {
+  need_cmd node
   if [ -n "${LUALS_VERSION:-}" ]; then
     printf '%s\n' "${LUALS_VERSION}"
     return
@@ -38,19 +38,36 @@ resolve_luals_version() {
   node -e "const r=await fetch('https://api.github.com/repos/LuaLS/lua-language-server/releases/latest').then(x=>x.json()); if(!r.tag_name) throw new Error('failed to resolve LuaLS latest release'); console.log(r.tag_name);"
 }
 
-download_luals_asset() {
-  local version="$1"
-  local target="$2"
-  local archive="lua-language-server-${version}-${target}.tar.gz"
-  local url="https://github.com/LuaLS/lua-language-server/releases/download/${version}/${archive}"
+find_luals_offline_archive() {
+  local target="$1"
+  find "${LUALS_OFFLINE_DIR}" -maxdepth 1 -type f -name "lua-language-server-*-${target}.tar.gz" | sort -V | tail -n 1
+}
+
+install_luals_target() {
+  local target="$1"
+  local offline_archive
+  offline_archive="$(find_luals_offline_archive "${target}")"
   local dest="${VENDOR_DIR}/lua-language-server/${target}"
 
   if [ -x "${dest}/bin/lua-language-server" ]; then
-    echo "LuaLS ${version} ${target} already installed."
+    echo "LuaLS ${target} already installed."
     return
   fi
 
-  echo "Installing LuaLS ${version} ${target}..."
+  if [ -n "${offline_archive}" ]; then
+    echo "Installing LuaLS from offline archive: ${offline_archive}"
+    rm -rf "${dest}"
+    mkdir -p "${dest}"
+    tar -xzf "${offline_archive}" -C "${dest}"
+    return
+  fi
+
+  need_cmd curl
+  local version
+  version="$(resolve_luals_version)"
+  local archive="lua-language-server-${version}-${target}.tar.gz"
+  local url="https://github.com/LuaLS/lua-language-server/releases/download/${version}/${archive}"
+  echo "Installing LuaLS ${version} ${target} from GitHub release..."
   rm -rf "${dest}"
   mkdir -p "${dest}"
   curl -fsSL "${url}" -o "${DOWNLOAD_DIR}/${archive}"
@@ -58,14 +75,11 @@ download_luals_asset() {
 }
 
 install_luals() {
-  local version
-  version="$(resolve_luals_version)"
-
   # Keep both Linux release artifacts locally so a cloned repo can be used in
   # x64 and arm64 Linux containers with the same installer behavior.
   local targets="${LUALS_LINUX_TARGETS:-linux-x64 linux-arm64}"
   for target in ${targets}; do
-    download_luals_asset "${version}" "${target}"
+    install_luals_target "${target}"
   done
 
   local machine
@@ -113,6 +127,7 @@ install_codegraph() {
   fi
 
   echo "Installing CodeGraph standalone bundle from GitHub release..."
+  need_cmd curl
   local version archive url
   version="${CODEGRAPH_VERSION:-}"
   if [ -z "${version}" ]; then
