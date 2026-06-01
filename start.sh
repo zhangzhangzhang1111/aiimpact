@@ -14,5 +14,8 @@ fi
 DATA_ROOT="${DATA_ROOT:-/data}"
 mkdir -p "${DATA_ROOT}/impact"
 bash scripts/install-tools.sh
+export PATH="${ROOT_DIR}/tools/vendor/bin:${PATH}"
+export LUALS_BIN="${LUALS_BIN:-${ROOT_DIR}/tools/vendor/bin/lua-language-server}"
+export CODEGRAPH_BIN="${CODEGRAPH_BIN:-${ROOT_DIR}/tools/vendor/bin/codegraph}"
 
 exec npm start

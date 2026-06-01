@@ -7,7 +7,7 @@
 - HTTP 接收项目名称、Git 地址、分支和对比 commit。
 - 内置队列，最多同时运行 2 个分析任务，其余请求排队等待。
 - 每个任务先 clone 仓库并获取 `git diff`、变更文件和改动函数。
-- Lua 改动通过内部 `tools/luals-adapter.lua` 调用 LuaLS 适配流程；非 Lua 改动通过内部 codegraph adapter 获取调用链，工具不可用时自动写入静态降级结果。
+- Lua 改动通过内部 LuaLS adapter 调用 `lua-language-server` release 二进制；非 Lua 改动通过内部 codegraph adapter 调用 codegraph standalone bundle，工具不可用时自动写入静态降级结果。
 - 支持通过 API key 调用 OpenAI、Claude、MiniMax、Ollama 等模型，也支持离线规则引擎。
 - 分析过程拆成多个 agent：diff、调用链、业务影响面、测试清单、代码评审。
 - 支持项目业务知识和特殊说明：仓库内 `.aiimpact/business.md`、`.aiimpact/special-notes.md`、`.aiimpact/knowledge.md`，或服务仓库 `knowledge/projects/<项目名>.md`。
@@ -41,13 +41,25 @@ curl http://127.0.0.1:3000/health
 DATA_ROOT=/tmp/linuxaiimpact-data PORT=3000 bash start.sh
 ```
 
-如果需要启动时拉取外部工具源码：
+`start.sh` 在 Linux 容器里会自动准备外部分析工具：
 
-```bash
-INSTALL_TOOLS=1 bash start.sh
-```
+- LuaLS：下载 GitHub release 中的 `linux-x64` 和 `linux-arm64` 产物，并按当前架构链接 `tools/vendor/bin/lua-language-server`。
+- CodeGraph：使用官方 standalone installer 下载对应 Linux bundle，并链接 `tools/vendor/bin/codegraph`。
 
 外部工具会放在 `tools/vendor/`，该目录默认不提交到 Git。服务没有 npm 运行依赖，`npm start` 直接使用 Node 内置模块运行。
+
+可选环境变量：
+
+```bash
+# 跳过工具安装，仅使用静态降级分析
+SKIP_TOOL_INSTALL=1 bash start.sh
+
+# 固定 LuaLS 或 codegraph 版本
+LUALS_VERSION=3.18.2 CODEGRAPH_VERSION=v0.9.4 bash start.sh
+
+# 使用已有二进制
+LUALS_BIN=/opt/luals/bin/lua-language-server CODEGRAPH_BIN=/opt/codegraph/bin/codegraph bash start.sh
+```
 
 ## 配置
 

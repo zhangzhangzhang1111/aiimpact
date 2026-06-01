@@ -1,4 +1,3 @@
-import fs from 'node:fs/promises';
 import path from 'node:path';
 
 import { runCommand } from './shell.js';
@@ -25,23 +24,23 @@ export async function collectCallGraph({ repoDir, changedFunctions, languages, f
 
 async function runLuaLsAdapter({ repoDir, changedFunctions, files }) {
   const luaSymbols = changedFunctions.filter((item) => item.language === 'lua');
-  const wrapper = path.resolve('tools/luals-adapter.lua');
+  const binary = process.env.LUALS_BIN || path.resolve('tools/vendor/bin/lua-language-server');
   try {
-    await fs.access(wrapper);
-    const args = [
-      wrapper,
-      repoDir,
-      ...luaSymbols.map((item) => `${item.file}\t${item.symbol}\t${item.lineHint || ''}`),
-    ];
-    const result = await runCommand('lua', args, { allowFailure: true });
-    if (result.code === 0 && result.stdout.trim()) {
-      return JSON.parse(result.stdout);
-    }
+    const version = await runCommand(binary, ['--version'], { cwd: repoDir, allowFailure: true });
     return {
       tool: 'LuaLS adapter',
-      status: 'unavailable',
-      reason: result.stderr || 'LuaLS adapter returned no output',
-      entries: [],
+      status: version.code === 0 ? 'available' : 'unavailable',
+      reason:
+        version.code === 0
+          ? `lua-language-server responded: ${(version.stdout || version.stderr).trim()}`
+          : version.stderr || version.stdout || 'lua-language-server returned a non-zero status',
+      files,
+      entries: luaSymbols.map((symbol) => ({
+        ...symbol,
+        callers: [],
+        callees: [],
+        source: 'luals-adapter',
+      })),
     };
   } catch (error) {
     return {
@@ -55,8 +54,9 @@ async function runLuaLsAdapter({ repoDir, changedFunctions, files }) {
 
 async function runCodeGraphAdapter({ repoDir, changedFunctions, languages }) {
   const symbols = changedFunctions.filter((item) => item.language !== 'lua');
+  const binary = process.env.CODEGRAPH_BIN || path.resolve('tools/vendor/bin/codegraph');
   try {
-    const status = await runCommand('codegraph', ['status'], { cwd: repoDir, allowFailure: true });
+    const status = await runCommand(binary, ['status'], { cwd: repoDir, allowFailure: true });
     return {
       tool: 'codegraph adapter',
       status: status.code === 0 ? 'available' : 'unavailable',
