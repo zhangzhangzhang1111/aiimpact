@@ -8,10 +8,14 @@
 
 <changed-functions>
 
-## 3. 标准匹配与问题清单
+## 3. 影响面感知审核清单
+
+<impact-aware-review-checklist>
+
+## 4. 标准匹配与问题清单
 
 <review-agent-output>
 
-## 4. 审核结论
+## 5. 审核结论与放行条件
 
 <review-conclusion>

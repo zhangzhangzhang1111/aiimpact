@@ -45,10 +45,13 @@ test('writeReports emits stable impact, test, and review template sections', asy
   const review = await fs.readFile(paths.reviewReport, 'utf8');
 
   assert.match(impact, /## 1\. 基本信息/);
-  assert.match(impact, /## 2\. 改动摘要/);
-  assert.match(impact, /## 6\. 业务影响面结论/);
-  assert.match(tests, /## 1\. 测试范围/);
-  assert.match(tests, /## 4\. 上线验证/);
+  assert.match(impact, /## 3\. 影响追踪矩阵/);
+  assert.match(impact, /## 7\. 非功能与运行风险/);
+  assert.match(impact, /## 10\. 待确认事项与签署/);
+  assert.match(tests, /## 1\. 测试计划标识与范围/);
+  assert.match(tests, /## 4\. 测试设计矩阵/);
+  assert.match(tests, /## 7\. 准入、暂停、恢复与退出准则/);
+  assert.match(tests, /## 10\. 覆盖追踪与审批/);
   assert.match(review, /## 1\. 语言与标准/);
-  assert.match(review, /## 4\. 审核结论/);
+  assert.match(review, /## 5\. 审核结论与放行条件/);
 });

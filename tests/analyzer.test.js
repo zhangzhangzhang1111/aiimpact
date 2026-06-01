@@ -65,9 +65,11 @@ test('analyzeProject clones a git repo, diffs against base commit, and writes ar
 
   assert.equal(summary.request.projectName, 'billing');
   assert.deepEqual(summary.languages.sort(), ['c/c++', 'lua']);
-  assert.match(impact, /## 6\. 业务影响面结论/);
+  assert.match(impact, /## 6\. 业务、需求、接口与数据影响/);
+  assert.match(impact, /## 10\. 待确认事项与签署/);
   assert.match(review, /## 1\. 语言与标准/);
-  assert.match(checklist, /## 4\. 上线验证/);
+  assert.match(checklist, /## 4\. 测试设计矩阵/);
+  assert.match(checklist, /## 11\. 上线验证/);
 });
 
 function git(cwd, args) {
