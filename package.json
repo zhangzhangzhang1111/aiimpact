@@ -1,0 +1,13 @@
+{
+  "name": "linuxaiimpact",
+  "version": "0.1.0",
+  "description": "HTTP impact analysis service for git diffs, call chains, AI business impact reports, and review checklists.",
+  "type": "module",
+  "engines": {
+    "node": ">=22.18.0"
+  },
+  "scripts": {
+    "start": "node src/main.js",
+    "test": "node --test"
+  }
+}

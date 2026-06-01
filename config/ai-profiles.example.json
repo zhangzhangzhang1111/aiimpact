@@ -1,0 +1,12 @@
+{
+  "ai": {
+    "defaultProfile": "openai",
+    "agents": {
+      "diff": "openai",
+      "callGraph": "ollama",
+      "businessImpact": "claude",
+      "testChecklist": "openai",
+      "review": "minimax"
+    }
+  }
+}

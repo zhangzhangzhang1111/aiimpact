@@ -1,0 +1,52 @@
+{
+  "host": "0.0.0.0",
+  "port": 3000,
+  "concurrency": 2,
+  "dataRoot": "/data",
+  "knowledgeDir": "knowledge/projects",
+  "standardsDir": "standards",
+  "ai": {
+    "defaultProfile": "offline",
+    "profiles": {
+      "offline": {
+        "provider": "offline",
+        "model": "offline-rule-engine"
+      },
+      "openai": {
+        "provider": "openai",
+        "apiKeyEnv": "OPENAI_API_KEY",
+        "model": "gpt-4.1",
+        "temperature": 0.2,
+        "maxTokens": 4096
+      },
+      "claude": {
+        "provider": "claude",
+        "apiKeyEnv": "ANTHROPIC_API_KEY",
+        "model": "claude-3-5-sonnet-latest",
+        "temperature": 0.2,
+        "maxTokens": 4096
+      },
+      "minimax": {
+        "provider": "minimax",
+        "apiKeyEnv": "MINIMAX_API_KEY",
+        "model": "MiniMax-Text-01",
+        "temperature": 0.2,
+        "maxTokens": 4096
+      },
+      "ollama": {
+        "provider": "ollama",
+        "baseUrl": "http://127.0.0.1:11434",
+        "model": "qwen2.5-coder",
+        "temperature": 0.2,
+        "maxTokens": 4096
+      }
+    },
+    "agents": {
+      "diff": "offline",
+      "callGraph": "offline",
+      "businessImpact": "offline",
+      "testChecklist": "offline",
+      "review": "offline"
+    }
+  }
+}
