@@ -56,11 +56,21 @@ async function runCodeGraphAdapter({ repoDir, changedFunctions, languages }) {
   const symbols = changedFunctions.filter((item) => item.language !== 'lua');
   const binary = process.env.CODEGRAPH_BIN || path.resolve('tools/vendor/bin/codegraph');
   try {
+    const init = await runCommand(binary, ['init', '-i'], { cwd: repoDir, allowFailure: true });
+    if (init.code !== 0) {
+      return {
+        tool: 'codegraph adapter',
+        status: 'unavailable',
+        reason: init.stderr || init.stdout || 'codegraph init -i failed',
+        languages,
+        entries: [],
+      };
+    }
     const status = await runCommand(binary, ['status'], { cwd: repoDir, allowFailure: true });
     return {
       tool: 'codegraph adapter',
       status: status.code === 0 ? 'available' : 'unavailable',
-      reason: status.code === 0 ? 'codegraph command responded' : status.stderr || status.stdout,
+      reason: status.code === 0 ? 'codegraph initialized and responded' : status.stderr || status.stdout,
       languages,
       entries: symbols.map((symbol) => ({
         ...symbol,

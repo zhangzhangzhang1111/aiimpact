@@ -7,7 +7,8 @@ test('install-tools installs Linux LuaLS release artifacts and codegraph into to
 
   assert.match(script, /linux-x64 linux-arm64/);
   assert.match(script, /LuaLS\/lua-language-server\/releases\/download/);
-  assert.match(script, /CODEGRAPH_INSTALL_DIR="\$\{VENDOR_DIR\}\/codegraph"/);
-  assert.match(script, /CODEGRAPH_BIN_DIR="\$\{BIN_DIR\}"/);
+  assert.match(script, /CODEGRAPH_OFFLINE_DIR/);
+  assert.match(script, /codegraph-\$\{target\}\.tar\.gz/);
+  assert.match(script, /tar -xzf "\$\{offline_archive\}"/);
   assert.match(script, /tools\/vendor/);
 });

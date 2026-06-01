@@ -5,6 +5,7 @@ ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 VENDOR_DIR="${ROOT_DIR}/tools/vendor"
 BIN_DIR="${VENDOR_DIR}/bin"
 DOWNLOAD_DIR="${VENDOR_DIR}/downloads"
+CODEGRAPH_OFFLINE_DIR="${CODEGRAPH_OFFLINE_DIR:-${ROOT_DIR}/tools/offline}"
 mkdir -p "${VENDOR_DIR}" "${BIN_DIR}" "${DOWNLOAD_DIR}"
 
 if [ "${SKIP_TOOL_INSTALL:-0}" = "1" ]; then
@@ -89,13 +90,46 @@ install_codegraph() {
     return
   fi
 
-  echo "Installing CodeGraph standalone bundle..."
-  local installer="${DOWNLOAD_DIR}/codegraph-install.sh"
-  curl -fsSL https://raw.githubusercontent.com/colbymchenry/codegraph/main/install.sh -o "${installer}"
-  CODEGRAPH_INSTALL_DIR="${VENDOR_DIR}/codegraph" \
-    CODEGRAPH_BIN_DIR="${BIN_DIR}" \
-    CODEGRAPH_VERSION="${CODEGRAPH_VERSION:-}" \
-    sh "${installer}"
+  local machine target
+  machine="$(uname -m)"
+  case "${machine}" in
+    x86_64|amd64) target="linux-x64" ;;
+    arm64|aarch64) target="linux-arm64" ;;
+    *)
+      echo "Unsupported Linux architecture for CodeGraph: ${machine}" >&2
+      exit 1
+      ;;
+  esac
+
+  local offline_archive="${CODEGRAPH_OFFLINE_DIR}/codegraph-${target}.tar.gz"
+  local dest="${VENDOR_DIR}/codegraph/${target}"
+  if [ -f "${offline_archive}" ]; then
+    echo "Installing CodeGraph from offline archive: ${offline_archive}"
+    rm -rf "${dest}"
+    mkdir -p "${dest}"
+    tar -xzf "${offline_archive}" -C "${dest}" --strip-components=1
+    ln -sf "${dest}/bin/codegraph" "${BIN_DIR}/codegraph"
+    return
+  fi
+
+  echo "Installing CodeGraph standalone bundle from GitHub release..."
+  local version archive url
+  version="${CODEGRAPH_VERSION:-}"
+  if [ -z "${version}" ]; then
+    version="$(curl -fsSLI -o /dev/null -w '%{url_effective}' "https://github.com/colbymchenry/codegraph/releases/latest" | sed -n 's#.*/releases/tag/##p')"
+  fi
+  if [ -z "${version}" ]; then
+    echo "Could not resolve CodeGraph version. Provide ${offline_archive} or set CODEGRAPH_VERSION." >&2
+    exit 1
+  fi
+  case "${version}" in v*) ;; *) version="v${version}" ;; esac
+  archive="codegraph-${target}.tar.gz"
+  url="https://github.com/colbymchenry/codegraph/releases/download/${version}/${archive}"
+  rm -rf "${dest}"
+  mkdir -p "${dest}"
+  curl -fsSL "${url}" -o "${DOWNLOAD_DIR}/${archive}"
+  tar -xzf "${DOWNLOAD_DIR}/${archive}" -C "${dest}" --strip-components=1
+  ln -sf "${dest}/bin/codegraph" "${BIN_DIR}/codegraph"
 }
 
 install_luals

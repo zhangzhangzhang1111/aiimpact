@@ -44,7 +44,7 @@ DATA_ROOT=/tmp/linuxaiimpact-data PORT=3000 bash start.sh
 `start.sh` 在 Linux 容器里会自动准备外部分析工具：
 
 - LuaLS：下载 GitHub release 中的 `linux-x64` 和 `linux-arm64` 产物，并按当前架构链接 `tools/vendor/bin/lua-language-server`。
-- CodeGraph：使用官方 standalone installer 下载对应 Linux bundle，并链接 `tools/vendor/bin/codegraph`。
+- CodeGraph：优先从 `tools/offline/codegraph-linux-x64.tar.gz` 或 `tools/offline/codegraph-linux-arm64.tar.gz` 离线解压安装；没有离线包时才从 GitHub release 下载对应 Linux bundle，并链接 `tools/vendor/bin/codegraph`。
 
 外部工具会放在 `tools/vendor/`，该目录默认不提交到 Git。服务没有 npm 运行依赖，`npm start` 直接使用 Node 内置模块运行。
 
@@ -60,6 +60,21 @@ LUALS_VERSION=3.18.2 CODEGRAPH_VERSION=v0.9.4 bash start.sh
 # 使用已有二进制
 LUALS_BIN=/opt/luals/bin/lua-language-server CODEGRAPH_BIN=/opt/codegraph/bin/codegraph bash start.sh
 ```
+
+CodeGraph 离线安装只需要提前放置 release archive：
+
+```text
+tools/offline/codegraph-linux-x64.tar.gz
+tools/offline/codegraph-linux-arm64.tar.gz
+```
+
+启动时会按当前 Linux 架构解压到 `tools/vendor/codegraph/<target>/`，后续直接使用 `tools/vendor/bin/codegraph`。每个项目分析前，服务都会先在该项目工作目录执行：
+
+```bash
+codegraph init -i
+```
+
+初始化完成后再执行 `codegraph status` 并进入调用链分析流程。
 
 ## 配置
 
