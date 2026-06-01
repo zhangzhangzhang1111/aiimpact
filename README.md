@@ -7,7 +7,7 @@
 - HTTP 接收项目名称、Git 地址、分支和对比 commit。
 - 内置队列，最多同时运行 2 个分析任务，其余请求排队等待。
 - 每个任务先 clone 仓库并获取 `git diff`、变更文件和改动函数。
-- Lua 改动通过 `tools/luals-mcp-wrapper.lua` 适配 LuaLS MCP 流程；非 Lua 改动通过 codegraph 适配器获取调用链，工具不可用时自动写入静态降级结果。
+- Lua 改动通过内部 `tools/luals-adapter.lua` 调用 LuaLS 适配流程；非 Lua 改动通过内部 codegraph adapter 获取调用链，工具不可用时自动写入静态降级结果。
 - 支持通过 API key 调用 OpenAI、Claude、MiniMax、Ollama 等模型，也支持离线规则引擎。
 - 分析过程拆成多个 agent：diff、调用链、业务影响面、测试清单、代码评审。
 - 支持项目业务知识和特殊说明：仓库内 `.aiimpact/business.md`、`.aiimpact/special-notes.md`、`.aiimpact/knowledge.md`，或服务仓库 `knowledge/projects/<项目名>.md`。

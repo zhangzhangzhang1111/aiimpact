@@ -8,7 +8,7 @@ export async function collectCallGraph({ repoDir, changedFunctions, languages, f
   const results = [];
 
   if (languages.includes('lua')) {
-    results.push(await runLuaLsMcpAdapter({ repoDir, changedFunctions, files: filesByLanguage.lua || [] }));
+    results.push(await runLuaLsAdapter({ repoDir, changedFunctions, files: filesByLanguage.lua || [] }));
   }
 
   const nonLuaLanguages = languages.filter((language) => language !== 'lua');
@@ -23,9 +23,9 @@ export async function collectCallGraph({ repoDir, changedFunctions, languages, f
   };
 }
 
-async function runLuaLsMcpAdapter({ repoDir, changedFunctions, files }) {
+async function runLuaLsAdapter({ repoDir, changedFunctions, files }) {
   const luaSymbols = changedFunctions.filter((item) => item.language === 'lua');
-  const wrapper = path.resolve('tools/luals-mcp-wrapper.lua');
+  const wrapper = path.resolve('tools/luals-adapter.lua');
   try {
     await fs.access(wrapper);
     const args = [
@@ -38,14 +38,14 @@ async function runLuaLsMcpAdapter({ repoDir, changedFunctions, files }) {
       return JSON.parse(result.stdout);
     }
     return {
-      tool: 'LuaLS MCP',
+      tool: 'LuaLS adapter',
       status: 'unavailable',
-      reason: result.stderr || 'lua wrapper returned no output',
+      reason: result.stderr || 'LuaLS adapter returned no output',
       entries: [],
     };
   } catch (error) {
     return {
-      tool: 'LuaLS MCP',
+      tool: 'LuaLS adapter',
       status: 'unavailable',
       reason: error.message,
       entries: [],
@@ -58,7 +58,7 @@ async function runCodeGraphAdapter({ repoDir, changedFunctions, languages }) {
   try {
     const status = await runCommand('codegraph', ['status'], { cwd: repoDir, allowFailure: true });
     return {
-      tool: 'codegraph',
+      tool: 'codegraph adapter',
       status: status.code === 0 ? 'available' : 'unavailable',
       reason: status.code === 0 ? 'codegraph command responded' : status.stderr || status.stdout,
       languages,
@@ -71,7 +71,7 @@ async function runCodeGraphAdapter({ repoDir, changedFunctions, languages }) {
     };
   } catch (error) {
     return {
-      tool: 'codegraph',
+      tool: 'codegraph adapter',
       status: 'unavailable',
       reason: error.message,
       languages,

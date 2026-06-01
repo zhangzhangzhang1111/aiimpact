@@ -18,7 +18,7 @@ for i = 2, #arg do
   end
 end
 
-io.write('{"tool":"LuaLS MCP","status":"available","reason":"Lua wrapper executed; use vendor/lua-language-server for full language-server deployment","repoDir":"')
+io.write('{"tool":"LuaLS adapter","status":"available","reason":"LuaLS adapter executed; install vendor/lua-language-server for deeper LSP analysis","repoDir":"')
 io.write(escape_json(repo_dir))
 io.write('","entries":[')
 for index, entry in ipairs(entries) do
@@ -29,6 +29,6 @@ for index, entry in ipairs(entries) do
   io.write(escape_json(entry.symbol))
   io.write('","language":"lua","lineHint":')
   io.write(tostring(entry.line))
-  io.write(',"callers":[],"callees":[],"source":"luals-mcp-wrapper"}')
+  io.write(',"callers":[],"callees":[],"source":"luals-adapter"}')
 end
 io.write("]}")

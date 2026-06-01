@@ -6,7 +6,7 @@ export async function runAnalysisAgents({ aiClient, context }) {
   });
 
   const callGraphSummary = await aiClient.complete('callGraph', {
-    system: '你是调用链分析 agent，负责基于 LuaLS MCP、codegraph 和静态降级结果总结上下游影响。',
+    system: '你是调用链分析 agent，负责基于内部 LuaLS adapter、codegraph adapter 和静态降级结果总结上下游影响。',
     user: JSON.stringify(pickContext(context, ['changedFunctions', 'callGraph']), null, 2),
     fallback: buildCallGraphFallback(context),
   });
