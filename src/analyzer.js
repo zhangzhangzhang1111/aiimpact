@@ -9,7 +9,8 @@ import { loadLanguageStandards, loadProjectKnowledge } from './knowledge.js';
 import { collectCallGraph } from './toolAdapters.js';
 import { writeReports } from './reportWriter.js';
 
-export async function analyzeProject({ jobId, request, config }) {
+export async function analyzeProject({ jobId, request, config, progress = () => {} }) {
+  progress({ stage: 'prepare', message: '准备分析产物目录', percent: 8 });
   const paths = createArtifactPaths({
     dataRoot: config.dataRoot,
     projectName: request.projectName,
@@ -18,6 +19,7 @@ export async function analyzeProject({ jobId, request, config }) {
   });
   await fs.mkdir(paths.runDir, { recursive: true });
 
+  progress({ stage: 'git_diff', message: '拉取仓库并获取 git diff', percent: 18 });
   const repository = await prepareRepository({
     gitUrl: request.gitUrl,
     branch: request.branch,
@@ -29,6 +31,8 @@ export async function analyzeProject({ jobId, request, config }) {
   const changedPaths = changedFiles.map((item) => item.path);
   const { languages, filesByLanguage } = detectLanguages(changedPaths);
   const changedFunctions = extractChangedFunctions(repository.diff);
+  progress({ stage: 'language_scan', message: '识别语言、变更文件和改动函数', percent: 35 });
+
   const [knowledge, standards, callGraph] = await Promise.all([
     loadProjectKnowledge({
       repoDir: repository.repoDir,
@@ -44,6 +48,7 @@ export async function analyzeProject({ jobId, request, config }) {
       options: config.callGraph || {},
     }),
   ]);
+  progress({ stage: 'call_graph', message: '完成两层调用链和代码片段采集', percent: 62 });
 
   const context = {
     jobId,
@@ -64,7 +69,9 @@ export async function analyzeProject({ jobId, request, config }) {
     config: config.ai || {},
     requestedProfile: request.aiProfile,
   });
+  progress({ stage: 'ai_analysis', message: '调用 AI agent 生成影响面、测试和评审内容', percent: 78 });
   const agentOutputs = await runAnalysisAgents({ aiClient, context });
+  progress({ stage: 'write_reports', message: '写入报告和落地产物文件', percent: 92 });
   await writeReports({ paths, context, agentOutputs });
 
   return {

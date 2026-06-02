@@ -35,6 +35,14 @@ http://0.0.0.0:3000
 curl http://127.0.0.1:3000/health
 ```
 
+Web 控制台：
+
+```text
+http://127.0.0.1:3000/
+```
+
+控制台可以查看队列状态、分析任务进度、进度历史，以及已生成的影响面报告、测试清单、代码评审、Git diff、调用链 JSON 和摘要 JSON。
+
 默认产物目录是 `/data/impact`。如果本地环境没有 `/data` 写权限，可以临时覆盖：
 
 ```bash
@@ -185,9 +193,35 @@ export MINIMAX_API_KEY=...
 }
 ```
 
+任务执行过程中会返回 `progress`：
+
+```json
+{
+  "progress": {
+    "stage": "call_graph",
+    "message": "完成两层调用链和代码片段采集",
+    "percent": 62,
+    "history": []
+  }
+}
+```
+
 ### 列出任务
 
 `GET /api/jobs`
+
+### 查看产物内容
+
+`GET /api/jobs/<jobId>/artifacts/<artifactName>`
+
+支持的 `artifactName`：
+
+- `impactReport`
+- `testChecklist`
+- `reviewReport`
+- `diffFile`
+- `callGraphFile`
+- `summaryJson`
 
 ### 健康检查
 

@@ -1,0 +1,69 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>AI Impact Console</title>
+    <link rel="icon" href="/favicon.svg" />
+    <link rel="stylesheet" href="/styles.css" />
+  </head>
+  <body>
+    <main class="shell">
+      <header class="topbar">
+        <div>
+          <h1>AI Impact Console</h1>
+          <p>分析任务进度、队列状态和落地产物查看</p>
+        </div>
+        <button id="refreshButton" type="button">刷新</button>
+      </header>
+
+      <section class="summary" aria-label="队列概览">
+        <div>
+          <span>并发</span>
+          <strong id="queueConcurrency">-</strong>
+        </div>
+        <div>
+          <span>运行中</span>
+          <strong id="queueActive">-</strong>
+        </div>
+        <div>
+          <span>排队中</span>
+          <strong id="queuePending">-</strong>
+        </div>
+      </section>
+
+      <section class="workspace">
+        <aside class="jobs-panel">
+          <div class="panel-title">
+            <h2>分析任务</h2>
+            <span id="jobCount">0</span>
+          </div>
+          <div id="jobList" class="job-list"></div>
+        </aside>
+
+        <section class="detail-panel">
+          <div id="emptyState" class="empty-state">选择一个任务查看进度和产物内容</div>
+          <article id="jobDetail" class="job-detail hidden">
+            <div class="detail-head">
+              <div>
+                <h2 id="detailTitle"></h2>
+                <p id="detailMeta"></p>
+              </div>
+              <span id="detailStatus" class="status"></span>
+            </div>
+
+            <div class="progress-row">
+              <div class="progress-track"><div id="progressBar" class="progress-bar"></div></div>
+              <span id="progressText"></span>
+            </div>
+            <ol id="progressHistory" class="progress-history"></ol>
+
+            <div id="artifactTabs" class="artifact-tabs"></div>
+            <pre id="artifactContent" class="artifact-content"></pre>
+          </article>
+        </section>
+      </section>
+    </main>
+    <script src="/app.js" type="module"></script>
+  </body>
+</html>

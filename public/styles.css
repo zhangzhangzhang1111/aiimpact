@@ -1,0 +1,272 @@
+:root {
+  color-scheme: light;
+  --background: #f6f7f9;
+  --surface: #ffffff;
+  --surface-muted: #f0f3f7;
+  --border: #d8dee8;
+  --text: #172033;
+  --muted: #667085;
+  --accent: #2563eb;
+  --accent-dark: #1d4ed8;
+  --success: #16803c;
+  --warning: #b45309;
+  --danger: #b42318;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  background: var(--background);
+  color: var(--text);
+  font: 14px/1.5 ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+}
+
+button {
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: var(--surface);
+  color: var(--text);
+  cursor: pointer;
+  font: inherit;
+  padding: 8px 12px;
+}
+
+button:hover {
+  border-color: var(--accent);
+  color: var(--accent-dark);
+}
+
+.shell {
+  max-width: 1440px;
+  margin: 0 auto;
+  padding: 24px;
+}
+
+.topbar,
+.summary,
+.workspace {
+  display: grid;
+  gap: 16px;
+}
+
+.topbar {
+  align-items: center;
+  grid-template-columns: 1fr auto;
+  margin-bottom: 16px;
+}
+
+.topbar h1,
+.panel-title h2,
+.detail-head h2 {
+  margin: 0;
+}
+
+.topbar p,
+.detail-head p {
+  margin: 4px 0 0;
+  color: var(--muted);
+}
+
+.summary {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  margin-bottom: 16px;
+}
+
+.summary div,
+.jobs-panel,
+.detail-panel {
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--surface);
+}
+
+.summary div {
+  padding: 16px;
+}
+
+.summary span {
+  display: block;
+  color: var(--muted);
+}
+
+.summary strong {
+  display: block;
+  font-size: 24px;
+  margin-top: 4px;
+}
+
+.workspace {
+  align-items: start;
+  grid-template-columns: minmax(280px, 360px) 1fr;
+}
+
+.jobs-panel,
+.detail-panel {
+  min-height: 620px;
+  overflow: hidden;
+}
+
+.panel-title {
+  align-items: center;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  justify-content: space-between;
+  padding: 16px;
+}
+
+.panel-title span {
+  background: var(--surface-muted);
+  border-radius: 999px;
+  color: var(--muted);
+  min-width: 28px;
+  padding: 2px 8px;
+  text-align: center;
+}
+
+.job-list {
+  max-height: 720px;
+  overflow: auto;
+}
+
+.job-item {
+  border: 0;
+  border-bottom: 1px solid var(--border);
+  border-radius: 0;
+  display: block;
+  padding: 14px 16px;
+  text-align: left;
+  width: 100%;
+}
+
+.job-item.active {
+  background: #edf4ff;
+}
+
+.job-item strong {
+  display: block;
+  overflow-wrap: anywhere;
+}
+
+.job-item span {
+  color: var(--muted);
+  display: block;
+  margin-top: 4px;
+}
+
+.detail-panel {
+  padding: 0;
+}
+
+.empty-state {
+  color: var(--muted);
+  padding: 32px;
+}
+
+.job-detail {
+  padding: 20px;
+}
+
+.hidden {
+  display: none;
+}
+
+.detail-head {
+  align-items: start;
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.status {
+  border-radius: 999px;
+  background: var(--surface-muted);
+  color: var(--muted);
+  padding: 4px 10px;
+  white-space: nowrap;
+}
+
+.status.completed {
+  background: #eaf7ee;
+  color: var(--success);
+}
+
+.status.running,
+.status.queued {
+  background: #eef4ff;
+  color: var(--accent-dark);
+}
+
+.status.failed {
+  background: #fff1f0;
+  color: var(--danger);
+}
+
+.progress-row {
+  align-items: center;
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 12px;
+  margin: 20px 0 8px;
+}
+
+.progress-track {
+  background: var(--surface-muted);
+  border-radius: 999px;
+  height: 10px;
+  overflow: hidden;
+}
+
+.progress-bar {
+  background: var(--accent);
+  height: 100%;
+  transition: width 180ms ease;
+  width: 0;
+}
+
+.progress-history {
+  color: var(--muted);
+  margin: 0 0 20px;
+  padding-left: 20px;
+}
+
+.artifact-tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.artifact-tabs button.active {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: white;
+}
+
+.artifact-content {
+  background: #0f172a;
+  border-radius: 8px;
+  color: #e5e7eb;
+  min-height: 360px;
+  max-height: 720px;
+  overflow: auto;
+  padding: 16px;
+  white-space: pre-wrap;
+}
+
+@media (max-width: 860px) {
+  .shell {
+    padding: 16px;
+  }
+
+  .summary,
+  .workspace {
+    grid-template-columns: 1fr;
+  }
+
+  .topbar {
+    grid-template-columns: 1fr;
+  }
+}
