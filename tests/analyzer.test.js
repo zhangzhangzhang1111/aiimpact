@@ -54,6 +54,7 @@ test('analyzeProject clones a git repo, diffs against base commit, and writes ar
       dataRoot,
       knowledgeDir: path.join(tmp, 'knowledge'),
       standardsDir: path.resolve('standards'),
+      callGraph: { depth: 2 },
       ai: { profiles: { offline: { provider: 'offline' } }, defaultProfile: 'offline' },
     },
   });
@@ -62,9 +63,14 @@ test('analyzeProject clones a git repo, diffs against base commit, and writes ar
   const impact = await fs.readFile(result.impactReport, 'utf8');
   const review = await fs.readFile(result.reviewReport, 'utf8');
   const checklist = await fs.readFile(result.testChecklist, 'utf8');
+  const diffPatch = await fs.readFile(result.diffFile, 'utf8');
 
   assert.equal(summary.request.projectName, 'billing');
   assert.deepEqual(summary.languages.sort(), ['c/c++', 'lua']);
+  assert.equal(summary.callGraphDepth, 2);
+  assert.match(diffPatch, /diff --git a\/src\/main.lua b\/src\/main.lua/);
+  assert.match(diffPatch, /\+  if not order then return nil end/);
+  assert.equal(summary.artifacts.diff, result.diffFile);
   assert.match(impact, /## 6\. 业务、需求、接口与数据影响/);
   assert.match(impact, /## 10\. 待确认事项与签署/);
   assert.match(review, /## 1\. 语言与标准/);

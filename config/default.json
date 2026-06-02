@@ -5,6 +5,11 @@
   "dataRoot": "/data",
   "knowledgeDir": "knowledge/projects",
   "standardsDir": "standards",
+  "callGraph": {
+    "depth": 2,
+    "maxNodes": 80,
+    "codeContextLines": 20
+  },
   "ai": {
     "defaultProfile": "offline",
     "profiles": {

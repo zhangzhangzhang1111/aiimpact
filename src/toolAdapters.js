@@ -3,7 +3,8 @@ import path from 'node:path';
 import { runCommand } from './shell.js';
 import { buildStaticCallGraph } from './staticCallGraph.js';
 
-export async function collectCallGraph({ repoDir, changedFunctions, languages, filesByLanguage }) {
+export async function collectCallGraph({ repoDir, changedFunctions, languages, filesByLanguage, options = {} }) {
+  const depth = Number.isInteger(options.depth) && options.depth > 0 ? options.depth : 2;
   const results = [];
 
   if (languages.includes('lua')) {
@@ -15,8 +16,9 @@ export async function collectCallGraph({ repoDir, changedFunctions, languages, f
     results.push(await runCodeGraphAdapter({ repoDir, changedFunctions, languages: nonLuaLanguages }));
   }
 
-  const staticGraph = await buildStaticCallGraph({ repoDir, changedFunctions });
+  const staticGraph = await buildStaticCallGraph({ repoDir, changedFunctions, depth, options });
   return {
+    depth,
     tools: results,
     entries: mergeGraphEntries(results.flatMap((item) => item.entries || []), staticGraph),
   };

@@ -6,13 +6,13 @@ export async function runAnalysisAgents({ aiClient, context }) {
   });
 
   const callGraphSummary = await aiClient.complete('callGraph', {
-    system: '你是调用链分析 agent，负责基于内部 LuaLS adapter、codegraph adapter 和静态降级结果总结上下游影响。',
+    system: '你是调用链分析 agent，负责基于内部 LuaLS adapter、codegraph adapter 和静态降级结果总结默认两层上下游影响，重点使用链路节点里的函数代码片段。',
     user: JSON.stringify(pickContext(context, ['changedFunctions', 'callGraph']), null, 2),
     fallback: buildCallGraphFallback(context),
   });
 
   const knowledgeImpact = await aiClient.complete('businessImpact', {
-    system: '你是业务影响面分析 agent，负责结合项目业务知识、特殊说明和调用链输出功能影响。',
+    system: '你是业务影响面分析 agent，负责结合项目业务知识、特殊说明、两层调用链函数和代码片段输出功能影响。',
     user: JSON.stringify(pickContext(context, ['knowledge', 'changedFunctions', 'callGraph']), null, 2),
     fallback: buildBusinessFallback(context),
   });

@@ -41,6 +41,7 @@ export async function analyzeProject({ jobId, request, config }) {
       changedFunctions,
       languages,
       filesByLanguage,
+      options: config.callGraph || {},
     }),
   ]);
 

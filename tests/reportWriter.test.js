@@ -28,7 +28,7 @@ test('writeReports emits stable impact, test, and review template sections', asy
     changedFunctions: [{ file: 'a.lua', symbol: 'a.run', language: 'lua', lineHint: 1 }],
     knowledge: [{ source: 'repository:.aiimpact/business.md', content: 'orders are critical' }],
     standards: [{ language: 'lua', source: 'standards/lua.md', content: 'check nil' }],
-    callGraph: { tools: [], entries: [] },
+    callGraph: { depth: 2, tools: [], entries: [] },
   };
   const agentOutputs = {
     diffSummary: 'diff summary',
@@ -45,6 +45,7 @@ test('writeReports emits stable impact, test, and review template sections', asy
   const review = await fs.readFile(paths.reviewReport, 'utf8');
 
   assert.match(impact, /## 1\. 基本信息/);
+  assert.match(impact, /调用链深度 \| 2 层/);
   assert.match(impact, /## 3\. 影响追踪矩阵/);
   assert.match(impact, /## 7\. 非功能与运行风险/);
   assert.match(impact, /## 10\. 待确认事项与签署/);

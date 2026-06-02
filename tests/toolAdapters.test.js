@@ -18,6 +18,7 @@ test('collectCallGraph uses internal LuaLS and codegraph adapters without legacy
     ],
   });
 
+  assert.equal(result.depth, 2);
   const toolNames = result.tools.map((tool) => tool.tool);
   assert.deepEqual(toolNames, ['LuaLS adapter', 'codegraph adapter']);
   assert.equal(result.tools.every((tool) => tool.tool.endsWith('adapter')), true);
@@ -46,6 +47,7 @@ test('collectCallGraph uses configured bundled tool binaries', async () => {
   try {
     const result = await collectCallGraph({
       repoDir,
+      options: { depth: 2 },
       languages: ['lua', 'c/c++'],
       filesByLanguage: { lua: ['main.lua'], 'c/c++': ['risk.cpp'] },
       changedFunctions: [

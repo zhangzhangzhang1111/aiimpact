@@ -14,6 +14,7 @@ export async function writeReports({ paths, context, agentOutputs }) {
         request: context.request,
         headCommit: context.headCommit,
         languages: context.languages,
+        callGraphDepth: context.callGraph?.depth || 2,
         changedFiles: context.changedFiles,
         changedFunctions: context.changedFunctions,
         artifacts: {
@@ -44,6 +45,7 @@ function renderImpactReport({ context, agentOutputs }) {
     `| 对比 commit | ${context.request.baseCommit} |`,
     `| HEAD | ${context.headCommit} |`,
     `| 语言 | ${context.languages.join(', ') || '未识别'} |`,
+    `| 调用链深度 | ${context.callGraph?.depth || 2} 层 |`,
     `| 改动文件数 | ${context.changedFiles.length} |`,
     `| 改动函数数 | ${context.changedFunctions.length} |`,
     '',
